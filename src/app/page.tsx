@@ -4,10 +4,12 @@ import { api } from "@/lib/api";
 import { usernameKey } from "@/utils/constants";
 import { generateUserName } from "@/utils/generate-user-name";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [username, setUsername] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fn = () => {
@@ -26,6 +28,10 @@ export default function Home() {
   const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
     mutationFn: async () => {
       const res = await api.room.create.post();
+
+      if (res.status === 200 && res.data?.roomId) {
+        router.push(`/room/${res.data.roomId}`);
+      }
     },
   });
 
