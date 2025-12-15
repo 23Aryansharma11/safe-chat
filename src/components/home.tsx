@@ -12,7 +12,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   "invalid-url": "Invalid room URL.",
   "room-not-found": "This room does not exist.",
   "room-full": "Room is full!",
-  destroyed: "Room was destroyed",
+  "destroyed": "Room was destroyed",
 };
 
 export function Home() {

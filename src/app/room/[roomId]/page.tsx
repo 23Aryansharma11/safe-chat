@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useUsername } from "@/hooks/use-username";
@@ -15,7 +15,18 @@ const RoomPage = () => {
   const params = useParams();
   const router = useRouter();
   const roomId = params.roomId as string;
-  const [timeRemaining, setTimeRemaining] = useState<number | null>(10);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+
+  const { data: ttlData } = useQuery({
+    queryKey: ["ttl", roomId],
+    queryFn: async () => {
+      const res = await api.room.ttl.get({
+        query: { roomId },
+      });
+      return res.data;
+    },
+  });
+
   const { username } = useUsername();
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +71,36 @@ const RoomPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (ttlData?.ttl !== undefined) {
+      setTimeRemaining(ttlData.ttl);
+    }
+  }, [ttlData]);
+  useEffect(() => {
+    if (timeRemaining === null || timeRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (newTime <= 0) {
+          clearInterval(interval);
+          router.push("/?error=destroyed");
+          return 0;
+        }
+        const newTime = prev - 1;
+
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeRemaining, router]);
+
+  const { mutate: destroyRoom } = useMutation({
+    mutationFn: async () => {
+      await api.room.delete(null, { query: { roomId } });
+    },
+  });
+
   return (
     <main className="flex flex-col h-dvh max-h-dvh overflow-hidden bg-base text-foreground">
       <header className="border-b border-surface-1 p-4 flex items-center justify-between bg-surface-0">
@@ -94,7 +135,10 @@ const RoomPage = () => {
             </span>
           </div>
         </div>
-        <button className="text-sm bg-crust uppercase px-3 py-1.5 rounded text-color-foreground hover:bg-color-mantle font-bold transition-all group flex items-center gap-2 disabled:opacity-50 font-mono disabled:cursor-not-allowed cursor-pointer">
+        <button
+          className="text-sm bg-crust uppercase px-3 py-1.5 rounded text-color-foreground hover:bg-color-mantle font-bold transition-all group flex items-center gap-2 disabled:opacity-50 font-mono disabled:cursor-not-allowed cursor-pointer"
+          onClick={() => destroyRoom()}
+        >
           <span className="animate-pulse size-2 rounded-full bg-red-500" />
           Destroy Now
         </button>
