@@ -6,7 +6,7 @@ import { roomTTLSeconds } from "@/utils/constants";
 
 export const room = new Elysia({ prefix: "/room" }).post(
   "/create",
-  async () => {
+  async ({ set }) => {
     const roomId = nanoid();
     const redisId = `meta:${roomId}`;
     // create a room
@@ -16,6 +16,7 @@ export const room = new Elysia({ prefix: "/room" }).post(
     });
 
     await redis.expire(redisId, roomTTLSeconds);
+    set.status = 201;
     return { roomId };
   },
 );
