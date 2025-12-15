@@ -3,11 +3,15 @@
 import { useParams } from "next/navigation";
 
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
+import { formatTime } from "@/utils/format-time";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 const RoomPage = () => {
   const params = useParams();
   const roomId = params.roomId as string;
+
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(90);
 
   const onCopyClick = () => {
     const url = window.location.href;
@@ -32,6 +36,20 @@ const RoomPage = () => {
                 Copy
               </button>
             </div>
+          </div>
+          <div className="h-8 w-px bg-overlay-2" />
+
+          <div className="flex flex-col">
+            <span className="text-xs text-subtext-0 uppercase">
+              Self Destruct
+            </span>
+            <span
+              className={`text-sm font-bold flex items-center gap-2
+              ${timeRemaining !== null && timeRemaining < 60 ? "text-red-500" : "text-amber-500"}
+            `}
+            >
+              {timeRemaining !== null ? formatTime(timeRemaining) : "--:--"}
+            </span>
           </div>
         </div>
       </header>
