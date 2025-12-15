@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { NextRequest, NextResponse } from "next/server";
+
 import { redis } from "./lib/redis";
 
 export const proxy = async (req: NextRequest) => {

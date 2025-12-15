@@ -1,9 +1,9 @@
 "use client";
 
+import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { api } from "@/lib/api";
 import { usernameKey } from "@/utils/constants";
