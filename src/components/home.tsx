@@ -36,7 +36,6 @@ export function Home() {
   const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
     mutationFn: async () => {
       const res = await api.room.create.post();
-      console.log(res);
       if (res.status === 201 && res.data?.roomId) {
         router.push(`/room/${res.data.roomId}`);
       } else {
