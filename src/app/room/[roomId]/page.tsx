@@ -82,7 +82,8 @@ const RoomPage = () => {
 
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
-        const newTime = prev - 1;
+        const current = prev ?? timeRemaining;
+        const newTime = current - 1;
 
         if (newTime <= 0) {
           clearInterval(interval);
@@ -108,7 +109,9 @@ const RoomPage = () => {
         {/* Left: Room ID + Timer - Stack on mobile */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 flex-1 min-w-0">
           <div className="flex flex-col min-w-0">
-            <span className="text-xs text-subtext-0 uppercase font-mono">ROOM ID</span>
+            <span className="text-xs text-subtext-0 uppercase font-mono">
+              ROOM ID
+            </span>
             <div className="flex items-center gap-2">
               <span className="font-bold text-subtext-0 font-mono truncate text-sm ">
                 {roomId}
@@ -121,9 +124,11 @@ const RoomPage = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="flex flex-col items-end sm:items-center min-w-0">
-            <span className="text-xs text-subtext-0 uppercase font-mono">Self Destruct</span>
+            <span className="text-xs text-subtext-0 uppercase font-mono">
+              Self Destruct
+            </span>
             <span
               className={`text-sm font-bold flex items-center gap-2 font-mono truncate
                 ${timeRemaining !== null && timeRemaining < 60 ? "text-red-500" : "text-amber-500"}
@@ -133,7 +138,7 @@ const RoomPage = () => {
             </span>
           </div>
         </div>
-      
+
         {/* Right: Destroy Button - Full width on mobile */}
         <div className="flex justify-end sm:justify-center">
           <button
