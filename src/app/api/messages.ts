@@ -48,4 +48,22 @@ export const messages = new Elysia({ prefix: "/messages" })
       }),
       query: z.object({ roomId: z.string() }),
     },
+  )
+  .get(
+    "/",
+    async ({ auth }) => {
+      const messages = await redis.lrange<Message>(
+        "messages:" + auth.roomId,
+        0,
+        -1,
+      );
+
+      return {
+        messages: messages.map((m) => ({
+          ...m,
+          token: m.token === auth.token ? auth.token : undefined,
+        })),
+      };
+    },
+    { query: z.object({ roomId: z.string() }) },
   );

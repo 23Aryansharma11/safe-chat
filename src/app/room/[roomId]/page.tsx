@@ -1,14 +1,15 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useUsername } from "@/hooks/use-username";
 import { api } from "@/lib/api";
+import { useRealtime } from "@/lib/realtime-client";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
-import { formatTime } from "@/utils/format-time";
+import { format } from "date-fns";
 
 const RoomPage = () => {
   const params = useParams();
@@ -24,6 +25,8 @@ const RoomPage = () => {
         { sender: username, text },
         { query: { roomId } },
       );
+
+      setInputValue("");
     },
   });
 
@@ -34,6 +37,24 @@ const RoomPage = () => {
   };
 
   const isSubmitDisabled = inputValue.trim().length === 0 && !isMessagePending; // Fixed logic
+
+  const { data: messages, refetch: refetchMessages } = useQuery({
+    queryKey: ["messages", roomId],
+    queryFn: async () => {
+      const res = await api.messages.get({ query: { roomId } });
+      return res.data;
+    },
+  });
+
+  useRealtime({
+    channels: [roomId],
+    events: ["chat.message", "chat.destroy"],
+    onData: ({ event }) => {
+      if (event === "chat.message") {
+        refetchMessages();
+      }
+    },
+  });
 
   return (
     <main className="flex flex-col h-dvh max-h-dvh overflow-hidden bg-base text-foreground">
@@ -75,7 +96,31 @@ const RoomPage = () => {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-color-mantle"></div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-color-mantle">
+        {messages?.messages.length === 0 && (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-surface-2 text-sm">No messages yet</p>
+          </div>
+        )}
+
+        {messages?.messages.map((msg) => (
+          <div key={msg.id} className="flex flex-col items-start">
+            <div className="max-w-[80%] goup">
+              <div className="flex items-baseline gap-3 mb-1">
+                <span
+                  className={`text-xs font-bold ${msg.sender === username ? "text-surface-2" : "text-foreground"}`}
+                >
+                  {msg.sender === username ? "YOU" : msg.sender}
+                </span>
+                <span className="text-[10px] text-crust-2">
+                  {format(msg.timestamp, "HH:mm")}
+                </span>
+              </div>
+              <p className="text-sm text-foreground leading-relaxed break-all"></p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <div className="p-4 border-t border-color-subtext-0 bg-color-surface-0 shrink-0">
         <div className="flex gap-4">
