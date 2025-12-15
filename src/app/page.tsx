@@ -1,7 +1,9 @@
 "use client";
 
+import { api } from "@/lib/api";
 import { usernameKey } from "@/utils/constants";
 import { generateUserName } from "@/utils/generate-user-name";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -21,6 +23,12 @@ export default function Home() {
     fn();
   }, []);
 
+  const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
+    mutationFn: async () => {
+      const res = await api.room.create.post();
+    },
+  });
+
   return (
     <main className="flex h-dvh flex-col items-center justify-center p-4 bg-crust">
       <div className="w-full max-w-md space-y-8">
@@ -29,7 +37,7 @@ export default function Home() {
             # Safe Chat
           </h1>
           <p className="text-sm text-subtext-0">
-            Realtime | Safe | self destructing chat room
+            Realtime | Safe | Self-Destructing
           </p>
         </div>
         <div className="border border-overlay-0 bg-base/90 p-6 backdrop-blur-md">
@@ -44,7 +52,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <button className="w-full bg-surface-1 text-overlay-2 p-3 text-sm font-bold hover:bg-surface-0 hover:text-overlay-1 transition-colors mt-2 cursor-pointer disabled:opacity-50">
+            <button
+              className="w-full bg-surface-1 text-subtext p-3 text-sm font-bold hover:bg-surface-0 hover:text-overlay-1 transition-colors mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => createRoom()}
+              disabled={isCreateRoomPending}
+            >
               Create Secure Room
             </button>
           </div>
