@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -13,6 +13,7 @@ import { format } from "date-fns";
 
 const RoomPage = () => {
   const params = useParams();
+  const router = useRouter();
   const roomId = params.roomId as string;
   const [timeRemaining, setTimeRemaining] = useState<number | null>(10);
   const { username } = useUsername();
@@ -52,6 +53,9 @@ const RoomPage = () => {
     onData: ({ event }) => {
       if (event === "chat.message") {
         refetchMessages();
+      }
+      if (event === "chat.destroy") {
+        router.push("/?errors=destroyed");
       }
     },
   });
