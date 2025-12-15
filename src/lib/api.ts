@@ -1,4 +1,4 @@
-import { treaty } from "@elysiajs/eden";
 import type { appType } from "@/app/api/[[...slugs]]/route";
+import { treaty } from "@elysiajs/eden";
 
-export const { api } = treaty<appType>("localhost:3000");
+export const { api } = treaty<appType>("https://safe-chat-tan.vercel.app");
