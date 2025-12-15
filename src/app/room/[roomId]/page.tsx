@@ -1,9 +1,12 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import { useUsername } from "@/hooks/use-username";
+import { api } from "@/lib/api";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
 import { formatTime } from "@/utils/format-time";
 
@@ -11,8 +14,18 @@ const RoomPage = () => {
   const params = useParams();
   const roomId = params.roomId as string;
   const [timeRemaining, setTimeRemaining] = useState<number | null>(10);
+  const { username } = useUsername();
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { mutate: sendMessage, isPending: isMessagePending } = useMutation({
+    mutationFn: async ({ text }: { text: string }) => {
+      await api.messages.post(
+        { sender: username, text },
+        { query: { roomId } },
+      );
+    },
+  });
 
   const onCopyClick = () => {
     const url = window.location.href;
@@ -20,7 +33,7 @@ const RoomPage = () => {
     toast.success("Copied", { icon: null });
   };
 
-  const isSubmitDisabled = inputValue.trim().length === 0; // Fixed logic
+  const isSubmitDisabled = inputValue.trim().length === 0 && !isMessagePending; // Fixed logic
 
   return (
     <main className="flex flex-col h-dvh max-h-dvh overflow-hidden bg-base text-foreground">
@@ -81,6 +94,7 @@ const RoomPage = () => {
                 // send on enter
                 if (e.key === "Enter" && inputValue.trim()) {
                   // send message
+                  sendMessage({ text: inputValue });
                   inputRef.current?.focus();
                 }
               }}
@@ -89,6 +103,10 @@ const RoomPage = () => {
           <button
             className="text-base bg-overlay-2 hover:bg-overlay-1 px-6 font-bold rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-mono"
             disabled={isSubmitDisabled}
+            onClick={() => {
+              sendMessage({ text: inputValue });
+              inputRef.current?.focus();
+            }}
           >
             Send
           </button>

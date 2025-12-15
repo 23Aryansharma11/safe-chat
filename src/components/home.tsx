@@ -1,13 +1,12 @@
 "use client";
 
-import { toast } from "react-hot-toast";
-import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
+import { useUsername } from "@/hooks/use-username";
 import { api } from "@/lib/api";
-import { usernameKey } from "@/utils/constants";
-import { generateUserName } from "@/utils/generate-user-name";
 
 const ERROR_MESSAGES: Record<string, string> = {
   "invalid-url": "Invalid room URL.",
@@ -18,8 +17,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 export function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [username, setUsername] = useState("Generating Username...");
-
+  const { username } = useUsername();
   // Handle all ?error=... from middleware
   useEffect(() => {
     const error = searchParams.get("error");
@@ -33,21 +31,6 @@ export function Home() {
     // Remove the query param so it doesn't retrigger
     router.replace("/");
   }, [searchParams, router]);
-
-  useEffect(() => {
-    const fn = () => {
-      // username
-      const storedUserName = localStorage.getItem(usernameKey);
-      if (storedUserName) {
-        setUsername(storedUserName);
-        return;
-      }
-      const newUsername = generateUserName();
-      localStorage.setItem(usernameKey, newUsername);
-      setUsername(newUsername);
-    };
-    fn();
-  }, []);
 
   const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
     mutationFn: async () => {
