@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+
 import { api } from "@/lib/api";
 import { usernameKey } from "@/utils/constants";
 import { generateUserName } from "@/utils/generate-user-name";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Home() {
   const [username, setUsername] = useState("");
