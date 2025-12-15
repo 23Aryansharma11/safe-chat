@@ -1,74 +1,19 @@
-"use client";
+import { Home } from "@/components/home";
+import { Suspense } from "react";
 
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-import { api } from "@/lib/api";
-import { usernameKey } from "@/utils/constants";
-import { generateUserName } from "@/utils/generate-user-name";
-
-export default function Home() {
-  const [username, setUsername] = useState("Generating Username...");
-  const router = useRouter();
-
-  useEffect(() => {
-    const fn = () => {
-      const storedUserName = localStorage.getItem(usernameKey);
-      if (storedUserName) {
-        setUsername(storedUserName);
-        return;
-      }
-      const newUsername = generateUserName();
-      localStorage.setItem(usernameKey, newUsername);
-      setUsername(newUsername);
-    };
-    fn();
-  }, []);
-
-  const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
-    mutationFn: async () => {
-      const res = await api.room.create.post();
-
-      if (res.status === 200 && res.data?.roomId) {
-        router.push(`/room/${res.data.roomId}`);
-      }
-    },
-  });
-
+export default function Page() {
   return (
-    <main className="flex h-dvh flex-col items-center justify-center p-4 bg-crust">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            # Safe Chat
-          </h1>
-          <p className="text-sm text-subtext-0">
-            Realtime | Safe | Self-Destructing
-          </p>
-        </div>
-        <div className="border border-overlay-0 bg-base/90 p-6 backdrop-blur-md">
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="flex items-center text-overlay-1">
-                Your Name
-              </label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 bg-mantle border border-surface-1 p-3 text-sm text-subtext-0">
-                  {username}
-                </div>
-              </div>
-            </div>
-            <button
-              className="w-full bg-surface-1 text-subtext p-3 text-sm font-bold hover:bg-surface-0 hover:text-overlay-1 transition-colors mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => createRoom()}
-              disabled={isCreateRoomPending}
-            >
-              Create Secure Room
-            </button>
+    <Suspense
+      fallback={
+        <main className="flex h-dvh flex-col items-center justify-center p-4 bg-crust text-color-foreground">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-bold font-mono"># Safe Chat</h1>
+            <div className="text-subtext-0">Connecting...</div>
           </div>
-        </div>
-      </div>
-    </main>
+        </main>
+      }
+    >
+      <Home />
+    </Suspense>
   );
 }

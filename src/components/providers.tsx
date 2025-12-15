@@ -20,7 +20,6 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
             fontSize: "var(--text-xs)",
             padding: "2"
           },
-          duration: 500,
         }}
       />
     </QueryClientProvider>
