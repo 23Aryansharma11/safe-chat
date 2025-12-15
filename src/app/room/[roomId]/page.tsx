@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
 import { formatTime } from "@/utils/format-time";
-import { useState } from "react";
-import toast from "react-hot-toast";
 
 const RoomPage = () => {
   const params = useParams();
@@ -52,6 +52,11 @@ const RoomPage = () => {
             </span>
           </div>
         </div>
+
+        <button className="text-sm bg-crust uppercase px-3 py-1.5 rounded text-foreground hover:cursor-pointer hover:bg-mantle font-bold transition-all group flex items-center gap-2 disabled:opacity-50">
+          <span className="animate-pulse size-2 rounded-full bg-red-600" />
+          Destroy Now
+        </button>
       </header>
     </main>
   );
