@@ -12,7 +12,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   "invalid-url": "Invalid room URL.",
   "room-not-found": "This room does not exist.",
   "room-full": "Room is full!",
-  "destroyed": "Room was destroyed",
+  destroyed: "Room was destroyed",
 };
 
 export function Home() {
@@ -36,8 +36,8 @@ export function Home() {
   const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
     mutationFn: async () => {
       const res = await api.room.create.post();
-
-      if (res.status === 200 && res.data?.roomId) {
+      console.log(res);
+      if (res.status === 201 && res.data?.roomId) {
         router.push(`/room/${res.data.roomId}`);
       } else {
         toast.error("Failed to create room. Please try again.", {
