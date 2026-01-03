@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 import { nanoid } from "nanoid";
 import z from "zod";
 
@@ -8,18 +8,23 @@ import { roomTTLSeconds } from "@/utils/constants";
 import { authMiddleware } from "./auth-middleware";
 
 export const room = new Elysia({ prefix: "/room" })
-  .post("/create", async ({ set }) => {
+  .post("/create", async ({ set, body }) => {
     const roomId = nanoid();
     const redisId = `meta:${roomId}`;
+    const { time } = body
     // create a room
     await redis.hset(redisId, {
       connected: [],
       createdAt: Date.now(),
     });
 
-    await redis.expire(redisId, roomTTLSeconds);
+    await redis.expire(redisId, time * 60);
     set.status = 201;
     return { roomId };
+  }, {
+    body: t.Object({
+      time: t.Number({ minimum: 10, maximum: 120 })
+    })
   })
   .use(authMiddleware)
   .get(

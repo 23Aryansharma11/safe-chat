@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useUsername } from "@/hooks/use-username";
@@ -12,14 +12,15 @@ const ERROR_MESSAGES: Record<string, string> = {
   "invalid-url": "Invalid room URL.",
   "room-not-found": "This room does not exist.",
   "room-full": "Room is full!",
-  destroyed: "Room was destroyed",
+  "destroyed": "Room was destroyed",
 };
 
 export function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { username } = useUsername();
-  // Handle all ?error=... from middleware
+  const [time, setTime] = useState<number>(10)
+
   useEffect(() => {
     const error = searchParams.get("error");
     if (!error) return;
@@ -35,7 +36,9 @@ export function Home() {
 
   const { mutate: createRoom, isPending: isCreateRoomPending } = useMutation({
     mutationFn: async () => {
-      const res = await api.room.create.post();
+      const res = await api.room.create.post({
+        time
+      });
       if (res.status === 201 && res.data?.roomId) {
         router.push(`/room/${res.data.roomId}`);
       } else {
@@ -69,10 +72,28 @@ export function Home() {
                 </div>
               </div>
             </div>
+            <div className="space-y-2">
+              <label className="flex items-center text-overlay-1">
+                Room time (in mins)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  className="flex-1 bg-mantle border border-surface-1 p-3 text-sm text-subtext-0"
+                  value={time}
+                  type="number"
+                  inputMode="numeric"
+                  onChange={(e) => {
+                    setTime(Number(e.target.value))
+                  }}
+                  min={10}
+                  max={120}
+                />
+              </div>
+            </div>
             <button
               className="w-full bg-surface-1 text-subtext p-3 text-sm font-bold hover:bg-surface-0 hover:text-overlay-1 transition-colors mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => createRoom()}
-              disabled={isCreateRoomPending}
+              disabled={isCreateRoomPending || time < 10 || time > 120}
             >
               Create Secure Room
             </button>

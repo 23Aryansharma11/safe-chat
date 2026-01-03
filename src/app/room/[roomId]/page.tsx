@@ -106,7 +106,6 @@ const RoomPage = () => {
   return (
     <main className="flex flex-col h-dvh max-h-dvh overflow-hidden bg-base text-foreground">
       <header className="border-b border-surface-1 p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-surface-0">
-        {/* Left: Room ID + Timer - Stack on mobile */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 flex-1 min-w-0">
           <div className="flex flex-col min-w-0">
             <span className="text-xs text-subtext-0 uppercase font-mono">
@@ -139,7 +138,6 @@ const RoomPage = () => {
           </div>
         </div>
 
-        {/* Right: Destroy Button - Full width on mobile */}
         <div className="flex justify-end sm:justify-center">
           <button
             className="w-full sm:w-auto text-xs sm:text-sm bg-crust uppercase px-3 py-1.5 rounded text-foreground hover:bg-mantle font-bold transition-all group flex items-center justify-center gap-2 disabled:opacity-50 font-mono disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none max-w-40"
