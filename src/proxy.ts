@@ -22,13 +22,12 @@ export const proxy = async (req: NextRequest) => {
 
   const authToken = req.cookies.get("x-auth-token")?.value;
   console.log(meta.connected);
-  console.log(authToken);
   if (authToken && meta.connected.includes(authToken)) {
     // let user join
     return NextResponse.next();
   }
 
-  if (meta.connected.length >= 2) {
+  if (meta.connected.length > 2) {
     return NextResponse.redirect(new URL("/?error=room-full", req.url));
   }
 
